@@ -1,23 +1,47 @@
 import React from "react";
-import { View, Text } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, Text } from "react-native";
+import { useState, useEffect } from "react";
 
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { fetchUser } from '../redux/actions/index';
-import { useSelector } from 'react-redux';
+import { getAuth } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
-function Main({app}) {
-    //const dispatch = useDispatch();
-    //const { fetchUser } = bindActionCreators(actionCreators, dispatch);
-    //var user = useSelector((state) => state.user);
-    useEffect(() => {
-        fetchUser(app, 'bTUL23jiT6cTn8bxEXkdqyQkHdx2' )
-      }, [])
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+
+import { updateUser } from "../redux/reducers/userReducer";
+
+
+function Main({ app }) {
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  const dispatch = useDispatch();
+
+  const currentUser = useSelector((state) => state.user.value);
+
+  const [user, setUser] = useState ({username: '', email: ''});
+
+
+  useEffect(() => {
+    const getUser = async () => {
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUser({username: docSnap.data().username, email: docSnap.data().email});
+      } else {
+        console.log("couldn't find that user");
+      }
+      dispatch(updateUser({username: docSnap.data().username, email: docSnap.data().email}));
+    };
+    getUser();
+  }, []);
+
 
   return (
     <View style={{ flex: 1, justifyContent: "center" }}>
-      <Text>User is logged in</Text>
+      <Text>{user.username} is logged in</Text>
+      <Text>{currentUser.username} is logged in</Text>
     </View>
   );
 }

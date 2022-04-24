@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text } from 'react-native';
+import 'react-native-gesture-handler';
 
 import LandingScreen from './components/auth/Landing';
 import RegisterScreen from './components/auth/Register';
@@ -11,7 +12,7 @@ import { useState } from 'react';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { Provider } from 'react-redux';
-import { store } from "./redux/reducers/store";
+import { store } from "./redux/store/index";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBy_nJLEoiCDKqQVUDItMr4lHb5e0wBdJ0",
@@ -66,7 +67,7 @@ export default function App() {
 
     return(
       <Provider store={store}>
-      <MainScreen />
+      <MainScreen app={app} />
       </Provider>
     )
   }
